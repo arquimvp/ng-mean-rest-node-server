@@ -1,7 +1,9 @@
 // Cuando la aplicacion arranque se leera primero el puerto en el archivo config.js:
 require('./config/config');
 
-const express = require('express')
+const express = require('express');
+const mongoose = require('mongoose');
+
 const app = express()
 
 const bodyParser = require('body-parser')
@@ -12,38 +14,15 @@ app.use(bodyParser.urlencoded({ extended: false }))
 // parse application/json
 app.use(bodyParser.json())
 
+app.use(require('./routes/usuario'));
 
-app.get('/usuario', function(req, res) {
-    res.json('get usuario')
-});
+mongoose.connect(process.env.URLDB, { useNewUrlParser: true, useCreateIndex: true },
+    (err, res) => {
 
-app.post('/usuario', function(req, res) {
+        if (err) throw err;
 
-    let body = req.body;
-
-    if (body.nombre === undefined) {
-        res.status(400).json({
-            ok: true,
-            mensaje: 'El nombre es necesario'
-        });
-    } else {
-        res.json({
-            persona: body
-        });
-    }
-
-});
-
-app.put('/usuario/:id', function(req, res) {
-    let id = req.params.id;
-    res.json({
-        id
-    })
-});
-
-app.delete('/usuario', function(req, res) {
-    res.json('delete usuario')
-});
+        console.log('Base de datos ONLINE');
+    });
 
 // Escucho el puerto definido, si es ambiente de algun servidor utilizara el del ambiente, si no utiliza el 3000 (definido en config.js).
 app.listen(process.env.PORT, () => {
